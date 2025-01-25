@@ -2,7 +2,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-
 class APIKeyMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, api_key: str):
         super().__init__(app)
@@ -14,8 +13,8 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # Проверка API-ключа
-        api_key = request.headers.get("x-api-key")
-        if api_key != self.api_key:
+        provided_key = request.headers.get("x-api-key")
+        if provided_key != self.api_key:
             return JSONResponse(
                 {"detail": "Invalid API key"}, status_code=401
             )

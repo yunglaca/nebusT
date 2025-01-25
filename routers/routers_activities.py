@@ -1,17 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from db.database import db_dependency
-from crud.cruds_activities import create_activity, get_all_activities
-from schemas.schemas_app import ActivityCreate, ActivityOut
+from crud.cruds_activities import get_activities
+from schemas.activity_schemas import ActivitySchema
 from typing import List
+from utils.api_key_validation import verify_api_key
 
 router = APIRouter()
 
-# Роуты для деятельностей
-@router.post("/", response_model=ActivityOut)
-async def create_new_activity(db: db_dependency, activity: ActivityCreate):
-    return await create_activity(db, activity.name)
-
-
-@router.get("/", response_model=List[ActivityOut])
-async def get_activities(db: db_dependency):
-    return await get_all_activities(db)
+# Список всех видов деятельности
+@router.get("/activities", response_model=List[ActivitySchema])
+async def get_activities_route(db: db_dependency, api_key: str = Depends(verify_api_key)):
+    return await get_activities(db)

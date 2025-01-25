@@ -1,22 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from db.models import Activity
-from typing import List
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+from db.models import Activity  # Импортируем модель SQLAlchemy
+from schemas.activity_schemas import ActivitySchema # Импортируем схему Pydantic
 
-
-# Функция для создания активности
-async def create_activity(session: AsyncSession, name: str, parent_id: int = None):
-    if parent_id and parent_id not in [1, 2, 3]:
-        raise ValueError("parent_id должен быть числом от 1 до 3")
-    
-    new_activity = Activity(name=name, parent_id=parent_id)
-    session.add(new_activity)
-    await session.commit()
-    return new_activity
-
-
-# Функция для получения всех видов деятельности
-async def get_all_activities(session: AsyncSession) -> List[Activity]:
-    result = await session.execute(select(Activity))
+async def get_activities(db: AsyncSession):
+    # Пример запроса с асинхронной сессией и загрузкой связанных объектов
+    query = select(Activity).options(selectinload(Activity.children))  # Загрузка связанных детей
+    async with db.begin():
+        result = await db.execute(query)
     activities = result.scalars().all()
-    return activities
+
+    return [ActivitySchema.from_orm(activity) for activity in activities]
