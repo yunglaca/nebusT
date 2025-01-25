@@ -10,7 +10,6 @@ from db.database import Base, DATABASE_URL
 from db.models import *
 
 
-
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 target_metadata = Base.metadata

@@ -7,6 +7,7 @@ from utils.api_key_validation import verify_api_key
 
 router = APIRouter()
 
+
 # Список всех видов деятельности
 @router.get("/activities", response_model=List[ActivitySchema])
 async def get_activities_route(db: db_dependency, _: None = Depends(verify_api_key)):
