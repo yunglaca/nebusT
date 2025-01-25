@@ -2,7 +2,7 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Organization, Activity, organization_activity
 from schemas.organizations_schemas import OrganizationInDB
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import selectinload
 
 
 # 1 Функция для получения организаций по зданию
@@ -14,10 +14,7 @@ async def get_organizations_by_building(building_id: int, db: AsyncSession):
 
 
 # 2. Получение организаций по виду деятельности  без дочерних
-
-
 async def get_organizations_by_activity(activity_id: int, db: AsyncSession):
-    # Запрос на поиск организаций по основной деятельности
     query = (
         select(Organization)
         .join(organization_activity)
@@ -52,7 +49,6 @@ async def search_organizations_by_name(name: str, db: AsyncSession):
 
 # 5. Поиск организаций по названию деятельности включая дочерние
 async def get_organizations_by_activity_name(activity_name: str, db: AsyncSession):
-    # Шаг 1: Получаем основную активность с загрузкой всех её связанных сущностей через selectinload
     result = await db.execute(
         select(Activity)
         .filter(Activity.name == activity_name)
@@ -66,7 +62,6 @@ async def get_organizations_by_activity_name(activity_name: str, db: AsyncSessio
     activity = result.scalars().first()  # Получаем первую найденную активность
 
     if activity:
-        # Шаг 2: Собираем все связанные активности (дети, внуки и т.д.)
         activity_ids = [activity.id]
 
         # добавляем все дочерние активности на всех уровнях
@@ -76,8 +71,6 @@ async def get_organizations_by_activity_name(activity_name: str, db: AsyncSessio
                 collect_activity_ids(child)
 
         collect_activity_ids(activity)
-
-        # Шаг 3: Получаем организации, связанные с активностями
         query = (
             select(Organization)
             .join(organization_activity)
@@ -89,9 +82,8 @@ async def get_organizations_by_activity_name(activity_name: str, db: AsyncSessio
         )
 
         result = await db.execute(query)
-        organizations = result.scalars().all()  # Получаем все организации
+        organizations = result.scalars().all()
 
-        # Возвращаем организации в формате, который нам нужен
         return [OrganizationInDB.from_orm(org) for org in organizations]
 
     return []  # если нету, то пустой лист

@@ -7,13 +7,13 @@ from crud.crud_organizations import (
     search_organizations_by_name,
     get_organizations_by_activity_name,
 )
-from schemas.organizations_schemas import *
+from schemas.organizations_schemas import OrganizationInDB, OrganizationSearchResult, OrganizationSearchByActivityResult
 from db.database import db_dependency
 from utils.api_key_validation import verify_api_key
 
 router = APIRouter()
 
-
+# 1. Получение огранизации по зданию
 @router.get("/organizations/{building_id}")
 async def get_organizations(
     building_id: int, db: db_dependency, _: None = Depends(verify_api_key)
