@@ -9,5 +9,5 @@ router = APIRouter()
 
 # Список всех видов деятельности
 @router.get("/activities", response_model=List[ActivitySchema])
-async def get_activities_route(db: db_dependency, api_key: str = Depends(verify_api_key)):
+async def get_activities_route(db: db_dependency, _: None = Depends(verify_api_key)):
     return await get_activities(db)
