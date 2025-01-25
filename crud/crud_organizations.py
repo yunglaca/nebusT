@@ -1,9 +1,10 @@
 from sqlalchemy.future import select
+from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.models import Organization, Activity, organization_activity
+from db.models import Organization, Activity, organization_activity,Building
 from schemas.organizations_schemas import OrganizationInDB
 from sqlalchemy.orm import selectinload
-
+from schemas.builduing_schemas import BuildingSchema
 
 # 1 Функция для получения организаций по зданию
 async def get_organizations_by_building(building_id: int, db: AsyncSession):
@@ -87,3 +88,40 @@ async def get_organizations_by_activity_name(activity_name: str, db: AsyncSessio
         return [OrganizationInDB.from_orm(org) for org in organizations]
 
     return []  # если нету, то пустой лист
+#6 по области   (квадрат)
+async def get_organizations_and_buildings_in_area(
+    min_lat: float,
+    max_lat: float,
+    min_lon: float,
+    max_lon: float,
+    db: AsyncSession
+):
+    """
+    Функция для получения зданий и организаций в прямоугольной области
+    относительно заданных координат.
+    """
+    # Формирование запроса для получения зданий
+    query = select(Building).filter(
+        Building.latitude >= min_lat,
+        Building.latitude <= max_lat,
+        Building.longitude >= min_lon,
+        Building.longitude <= max_lon
+    )
+
+    # Выполнение запроса для получения зданий
+    buildings = (await db.execute(query)).scalars().all()
+
+    # Получаем список организаций, привязанных к зданиям
+    building_ids = [building.id for building in buildings]
+    organizations_query = select(Organization).filter(Organization.building_id.in_(building_ids))
+    organizations = (await db.execute(organizations_query)).scalars().all()
+
+    # Преобразование моделей SQLAlchemy в Pydantic схемы
+    building_models = [BuildingSchema.from_orm(building) for building in buildings]
+    organization_models = [OrganizationInDB.from_orm(org) for org in organizations]
+
+    # Формируем результат
+    return {
+        "buildings": building_models,
+        "organizations": organization_models,
+    }

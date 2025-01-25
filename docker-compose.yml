@@ -24,7 +24,7 @@ services:
     image: postgres:15
     restart: always
     ports:
-      - "5440:5432" # Маппинг порта PostgreSQL
+      - "5441:5432" # Маппинг порта PostgreSQL
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}

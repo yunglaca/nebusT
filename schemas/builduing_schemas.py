@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 # Схема для Building
-class Building(BaseModel):
+class BuildingSchema(BaseModel):
     id: int
     address: str
     latitude: float

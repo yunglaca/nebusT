@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from schemas.activity_schemas import ActivitySchema
-from schemas.builduing_schemas import Building
+from schemas.builduing_schemas import BuildingSchema
 from typing import List
 
 
@@ -9,7 +9,7 @@ class OrganizationInDB(BaseModel):
     id: int
     name: str
     phone_numbers: List[str]
-    building: Building
+    building: BuildingSchema
     activities: List[ActivitySchema] = []
 
     class Config:

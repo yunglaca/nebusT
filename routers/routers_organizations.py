@@ -6,6 +6,7 @@ from crud.crud_organizations import (
     get_organization_by_id,
     search_organizations_by_name,
     get_organizations_by_activity_name,
+    get_organizations_and_buildings_in_area
 )
 from schemas.organizations_schemas import OrganizationInDB, OrganizationSearchResult, OrganizationSearchByActivityResult
 from db.database import db_dependency
@@ -59,3 +60,25 @@ async def search_organizations_by_activity_route(
     activity_name: str, db: db_dependency, _: None = Depends(verify_api_key)
 ):
     return await get_organizations_by_activity_name(activity_name, db)
+
+# 6 поиск по области. 
+@router.get("/organizations_and_buildings_in_area", response_model=dict)
+async def get_organizations_and_buildings_in_area_endpoint(
+    db: db_dependency,
+    min_lat: float,
+    max_lat: float,
+    min_lon: float,
+    max_lon: float,
+    _: None = Depends(verify_api_key),
+):
+    """
+    Эндпоинт для получения организаций и зданий в прямоугольной области
+    относительно заданных координат.
+    """
+    try:
+        result = await get_organizations_and_buildings_in_area(
+            min_lat, max_lat, min_lon, max_lon, db
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
