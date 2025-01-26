@@ -3,7 +3,8 @@ sleep 10
 
 echo "Executing database migrations..."
 
-# Запускаем миграции Alembic
+
+# Применяем миграции до последней версии
 alembic upgrade head
 if [ $? -ne 0 ]; then
     echo "Migrations failed. Exiting."

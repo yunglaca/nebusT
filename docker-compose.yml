@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   app:
-    container_name: Nebustest2
+    container_name: Nebustest3
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/Nebustest2
+      - .:/Nebustest3
     depends_on:
       - db
     environment:
@@ -20,11 +20,11 @@ services:
       - "8000:8000"  # Проброс порта 8000 из контейнера на хост
 
   db:
-    container_name: nebusbase2
+    container_name: nebusbase3
     image: postgres:15
     restart: always
     ports:
-      - "5441:5432" # Маппинг порта PostgreSQL
+      - "5443:5432" # Маппинг порта PostgreSQL
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
