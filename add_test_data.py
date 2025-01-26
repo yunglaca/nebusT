@@ -1,6 +1,6 @@
 from db.database import async_session_maker
 from db.models import Building, Activity, Organization, organization_activity
-
+from sqlalchemy import insert
 
 async def add_test_data():
     async with async_session_maker() as session:
@@ -12,7 +12,7 @@ async def add_test_data():
             ]
             session.add_all(buildings)
 
-            # Добавление данных в таблицу activitys
+            # Добавление данных в таблицу activities
             activities = [
                 Activity(name="Еда", parent_id=None),
                 Activity(name="Мясная продукция", parent_id=1),
@@ -29,16 +29,21 @@ async def add_test_data():
             ]
             session.add_all(organizations)
 
-            # Добавление данных в таблицу organization_activity
-            org_activities = [
-                organization_activity(organization_id=1, activity_id=1),
-                organization_activity(organization_id=1, activity_id=2),
-                organization_activity(organization_id=2, activity_id=3),
-            ]
-            session.add_all(org_activities)
-
             # Сохраняем изменения в базе данных
             await session.commit()
+
+            # Добавление данных в таблицу связи organization_activity вручную
+            # Для этого используем insert() для явного добавления записей в таблицу связи
+            stmt = insert(organization_activity).values([
+                {"organization_id": 1, "activity_id": 1},
+                {"organization_id": 1, "activity_id": 2},
+                {"organization_id": 2, "activity_id": 3},
+            ])
+            await session.execute(stmt)
+            
+            # Сохраняем изменения в базе данных
+            await session.commit()
+
         except Exception as e:
             await session.rollback()
             print(f"Error adding test data: {e}")

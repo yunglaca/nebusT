@@ -24,13 +24,14 @@ services:
     image: postgres:15
     restart: always
     ports:
-      - "5443:5432" # Маппинг порта PostgreSQL
+      - "5443:5432"  # Маппинг порта PostgreSQL
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data  # Локальная папка для хранения данных
 
+# Убедитесь, что volumes определены правильно:
 volumes:
-  postgres_data:
+  postgres_data: {}  # Определение тома с пустым объектом
