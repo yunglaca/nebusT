@@ -30,8 +30,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data  # Локальная папка для хранения данных
+      - ./postgres_data:/var/lib/postgresql/data
 
-# Убедитесь, что volumes определены правильно:
 volumes:
   postgres_data: {}  # Определение тома с пустым объектом
